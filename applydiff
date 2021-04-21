@@ -1,0 +1,256 @@
+#!/usr/bin/perl
+#
+#  Apply a diff file. Patch used to do this, but it doesn`t seem
+#  to work any more.
+#
+#  Syntax:
+#  applydiff <filename> <patchfile> [options]
+#
+#  where possible options are
+#
+#  -b or --backup: Make a backup of the original file
+#  -R or --reverse: Reverse the changes (useful for testing)
+#
+#  Options can occur anywhere on the line, but <filename> must
+#  come before <patchfile>.
+#
+#  E. Anderson
+#  April 27, 2018
+#
+   $backup = 0;
+   $reverse = 0;
+   $olddir = "<";
+   @filelist = ();
+   while( @ARGV ) {
+      $_ = shift;
+      chomp;
+      ARGVCASE: {
+         if( /^-b/ || /^--backup/ ) {
+            $backup = 1; last ARGVCASE;
+         }
+         if( /^-R/ || /^--reverse/ ) {
+            $reverse = 1; $olddir = ">"; last ARGVCASE;
+         }
+         @filelist = (@filelist, $_);
+      }
+   }
+
+   if( ! defined( $filelist[0] ) ) {
+      die "Syntax: applydiff [-b|--backup] [-R|--reverse] <filename> <patchfile>\n";
+   } else {
+      $fname = $filelist[0];
+   }
+   if( ! defined( $filelist[1] ) ) {
+      die "Syntax: applydiff [-b|--backup] [-R|--reverse] <filename> <patchfile>\n";
+   } else {
+      $pfile = $filelist[1];
+   }
+   $tfile = `mktemp -p .`;
+   chomp( $tfile );
+   open( FN, $fname ) || die "Could not open file $fname\n";
+   open( PF, $pfile ) || die "Could not open file $pfile\n";
+   open( TF, ">$tfile" );
+   $ifile = 1;
+   while( $pline=<PF> ) {
+      chomp( $pline );
+#
+#     Diff output should be in the form
+#       <old range><op><new range>
+#     where the range may be a single number like 114 or a range
+#     like 126,140. Anything else is an error. The operations are
+#       a -- append new lines
+#       c -- replace old lines with new lines
+#       d -- delete old lines
+#
+      $ll = length($pline);
+      $first = 1;
+#
+#     Find the operator (a, c, or d)
+#
+      for( $ic=0; $ic<$ll; $ic++ ) {
+         $op = substr( $pline, $ic, 1 );
+         if( $op eq "a" || $op eq "c" || $op eq "d" ) { last; }
+      }
+      if( $ic >= $ll ) {
+         close( FN ); close( PF ); close( TF );
+         die "Unrecognized diff syntax: $pline\n";
+      }
+#
+#     Get the indices ic1:ic2 and jc1:jc2 of the old and new ranges
+#
+      $ofr = substr( $pline, 0, $ic );
+      $nfr = substr( $pline, $ic+1, length( $pline )-($ic+1) );
+      $icom = index( $ofr, "," );
+      if( $icom < 0 ) {
+         $ic1 = $ofr;
+         $ic2 = $ofr;
+      } else {
+         $ic1 = int( substr( $ofr, 0, $icom ) );
+         $ic2 = int( substr( $ofr, $icom+1, length( $ofr )-($icom+1) ) );
+      }
+      $jcom = index( $nfr, "," );
+      if( $jcom < 0 ) {
+         $jc1 = $nfr;
+         $jc2 = $nfr;
+      } else {
+         $jc1 = int( substr( $nfr, 0, $jcom ) );
+         $jc2 = int( substr( $nfr, $jcom+1, length( $nfr )-($jcom+1) ) );
+      }
+#
+#     Swap ic and jc indices if reversing.
+#
+      if( $reverse ) {
+         $i = $ic1; $j = $jc1;
+         $ic1 = $j; $jc1 = $i;
+         $i = $ic2; $j = $jc2;
+         $ic2 = $j; $jc2 = $i;
+         if( $op eq "a" ) {
+            $op = "d";
+         } elsif( $op eq "d" ) {
+            $op = "a";
+         }
+      }
+#
+#     Read and print lines of fname up to or including line ic1
+#
+      if( $op eq "a" ) {
+         $i2 = $ic1 + 1;
+      } else {
+         $i2 = $ic1;
+      }
+      for( $i=$ifile; $i<$i2; $i++ ) {
+         $fline = <FN>;
+         $ifile++;
+         printf TF "%s", $fline;
+      }
+#
+#     If reversing, read the patch file and save its lines to a buffer.
+#
+      if( $reverse && ( $op eq "c" || $op eq "a" ) ) {
+         for( $j = $jc1; $j <= $jc2; $j++ ) {
+            $pline = <PF>;
+            chomp($pline);
+            if( substr( $pline, 0, 1 ) ne "<" ) {
+               close( FN ); close( PF ); close( TF );
+               die "Expected leading '< ' in diff output\n",
+                   "Unrecognized diff spec: $pline\n";
+            }
+            $buffer[$j-$jc1] = substr( $pline, 2, length($pline)-2 );
+         }
+      }
+#
+#     Read and skip lines of fname if they match the diff output.
+#     Punt if they do not match.
+#
+      if( $op eq "c" || $op eq "d" ) {
+         for( $i=$ic1; $i<=$ic2; $i++ ) {
+            $fline = <FN>;
+            chomp( $fline );
+            $pline = <PF>;
+            if( $first && substr( $pline, 0, 3 ) eq "---" ) {
+               $pline = <PF>; $first = 0;
+            }
+            chomp( $pline );
+            $ifile++;
+            if( substr( $pline, 0, 1 ) ne $olddir ) {
+               close( FN ); close( PF ); close( TF );
+               die "Expected leading '$olddir' in diff output\n",
+                   "Unrecognized diff spec: $pline\n";
+            }
+            if( strcmpitb( $fline, substr( $pline, 2, length($pline)-2 ) ) == 0 ) {
+               close( FN ); close( PF ); close( TF );
+               printf "Diff syntax does not match line %d of file\n", $i;
+               printf "File contains: %s\n", $fline;
+               printf "Diff contains: %s\n", substr( $pline, 2, length($pline)-2 );
+               die;
+            }
+         }
+      }
+      if( $op eq "c" || $op eq "a" ) {
+         if( $reverse ) {
+#
+#           If reversing, print the substitute lines from the buffer.
+#
+            for( $j=$jc1; $j<=$jc2; $j++ ) {
+               printf TF "%s\n", $buffer[$j-$jc1];
+            }
+         } else {
+#
+#           Otherwise read and print the substitute lines from the diff output.
+#
+            for( $j=$jc1; $j<=$jc2; $j++ ) {
+               $pline = <PF>;
+               if( $first && substr( $pline, 0, 3 ) eq "---" ) {
+                  $pline = <PF>; $first = 0;
+               }
+               chomp($pline);
+               if( substr( $pline, 0, 1 ) ne ">" ) {
+                  close( FN ); close( PF ); close( TF );
+                  die "Expected leading '>' in diff output\n",
+                      "Unrecognized diff spec: $pline\n";
+               }
+               printf TF "%s\n", substr( $pline, 2, length($pline)-2 );
+            }
+         }
+      }
+   }
+   close( PF );
+#
+#  If we have reached the end of the diff file, read and print the remaining
+#  lines of fname.
+#
+   while( $fline=<FN> ) {
+      printf TF "%s", $fline;
+   }
+   close( $FN );
+   close( $TF );
+#
+#  Overwrite the original file, optionally making a backup
+#
+   `/bin/chmod --reference=$fname $tfile`;
+   if( $backup ) {
+      `/bin/mv --backup $tfile $fname`; 
+   } else {
+      `/bin/mv $tfile $fname`; 
+   }
+sub strcmpitb{
+#
+#  See if string1 is the same as string2, ignoring trailing blanks.
+#
+   my($string1) = $_[0];
+   my($string2) = $_[1];
+   my($ls1) = length($string1);
+   my($ls2) = length($string2);
+   my($i,$i1,$i2,$first,$same);
+   if( $ls1 < $ls2 ) {
+      $i1 = $ls1;
+      $i2 = $ls2;
+      $first = 0;
+   } else {
+      $i1 = $ls2;
+      $i2 = $ls1;
+      $first = 1;
+   }
+   $same = 1;
+   for( $i=0; $i<$i1; $i++ ) {
+      $c1 = substr( $string1, $i, 1 );
+      $c2 = substr( $string1, $i, 1 );
+      if( $c1 ne $c2 ) {
+         $same = 0; last;
+      }
+   }
+   if( $same ) {
+      while( $i<$i2 ) {
+         if( $first ) {
+            $c1 = substr( $string1, $i, 1 );
+         } else {
+            $c1 = substr( $string2, $i, 1 );
+         }
+         if( $c1 ne " " ) {
+            $same = 0; last;
+         }
+         $i++;
+      }
+   }
+   return $same;
+}
