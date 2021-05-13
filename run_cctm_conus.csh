@@ -51,9 +51,10 @@ if ( ! $?NPROW      )  setenv NPROW          6
 
 if ( ! $?NZ             ) setenv NZ                35
 if ( ! $?YYYYMM         ) setenv YYYYMM            201512
-if ( ! $?TM_ABFLUX      ) setenv TM_ABFLUX         N
+if ( ! $?CTM_ABFLUX     ) setenv CTM_ABFLUX        N
 if ( ! $?CTM_BIOGEMIS   ) setenv CTM_BIOGEMIS      N
 if ( ! $?CTM_OCEAN_CHEM ) setenv CTM_OCEAN_CHEM    N
+
 
 if ( ! $?EXECUTION_ID ) setenv EXECUTION_ID   "CMAQ_CCTM${VRSN}_`id -u -n`_`date -u +%Y%m%d_%H%M%S_%N`"
 
