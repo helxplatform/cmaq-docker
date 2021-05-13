@@ -36,15 +36,15 @@ if ( ! $?CTM_DIAG_LVL     )   setenv CTM_DIAG_LVL 0
 if (   $CTM_DIAG_LVL >= 2 )   set echo
 
 if ( ! $?NEW_START  )  setenv NEW_START     TRUE
-if ( ! $?START_DATE )  setenv START_DATE    "2016-07-01"
-if ( ! $?END_DATE   )  setenv END_DATE      "2016-07-02"
+if ( ! $?START_DATE )  setenv START_DATE    "2015-12-22"
+if ( ! $?END_DATE   )  setenv END_DATE      "2015-12-22"
 if ( ! $?START_TIME )  setenv START_TIME    000000
 if ( ! $?RUN_LENGTH )  setenv RUN_LENGTH    240000
 if ( ! $?TIME_STEP  )  setenv TIME_STEP     10000
 if ( ! $?NMLDIR     )  setenv NMLDIR        ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_gcc
 
-if ( ! $?APPL       )  setenv APPL           2016_12SE1
-if ( ! $?EMIS       )  setenv EMIS           2016ff
+if ( ! $?APPL       )  setenv APPL           12US2 
+if ( ! $?EMIS       )  setenv EMIS           2016fh
 if ( ! $?PROC       )  setenv PROC           mpi
 if ( ! $?NPCOL      )  setenv NPCOL          6
 if ( ! $?NPROW      )  setenv NPROW          6
