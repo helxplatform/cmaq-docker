@@ -43,7 +43,7 @@ if ( ! $?RUN_LENGTH )  setenv RUN_LENGTH    240000
 if ( ! $?TIME_STEP  )  setenv TIME_STEP     10000
 if ( ! $?NMLDIR     )  setenv NMLDIR        ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_gcc
 
-if ( ! $?APPL       )  setenv APPL           12US2 
+if ( ! $?APPL       )  setenv APPL           12US2
 if ( ! $?EMIS       )  setenv EMIS           2016fh
 if ( ! $?PROC       )  setenv PROC           mpi
 if ( ! $?NPCOL      )  setenv NPCOL          6
@@ -51,7 +51,7 @@ if ( ! $?NPROW      )  setenv NPROW          6
 
 if ( ! $?NZ             ) setenv NZ                35
 if ( ! $?YYYYMM         ) setenv YYYYMM            201512
-if ( ! $?TM_ABFLUX      ) setenv TM_ABFLUX         N
+if ( ! $?CTM_ABFLUX     ) setenv CTM_ABFLUX        N
 if ( ! $?CTM_BIOGEMIS   ) setenv CTM_BIOGEMIS      N
 if ( ! $?CTM_OCEAN_CHEM ) setenv CTM_OCEAN_CHEM    N
 
