@@ -43,6 +43,5 @@ RUN wget https://github.com/tsl0922/ttyd/releases/download/1.6.3/ttyd.x86_64 -O 
 USER $CMAQ_USER
 WORKDIR $CMAQ_HOME/CCTM/scripts
 
-CMD ["/bin/bash", "-c", "$BUILD_HOME/test-gcc.sh"]
-
-# CMD ["/usr/local/bin/ttyd","-p","7681","/bin/bash"]
+# CMD ["/bin/bash", "-c", "$BUILD_HOME/test-gcc.sh"]
+CMD ["/usr/local/bin/ttyd","-p","7681","/bin/bash"]
