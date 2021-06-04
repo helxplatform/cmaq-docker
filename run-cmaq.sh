@@ -14,6 +14,7 @@ RUN_TTYD=false
 LOCAL_TTYD_PORT=7681
 DOCKER_ARGS=""
 ENTRYPOINT_SCRIPT=run_cctm.csh
+EXTRA_DOCKER_OPTIONS=""
 
 function print_help() {
   echo "\
@@ -25,6 +26,7 @@ usage: $0
   -h|--help            Print this help message.
   -i|--local-image     use localhost registry for image
   -l|--local-ttyd-port specify TTYD port to use on localhost
+  -o|--docker-options  specify any extra docker command options
   -r|--nprow           specify nprow value (default=$NPROW)
   -s|--shell           start a bash shell instead of running \"$CMD\"
   -t|--ttyd            start ttyd and launch a bash shell instead of running \"$CMD\"
@@ -60,6 +62,10 @@ while [[ $# > 0 ]]
         ;;
       -l|--local-ttyd-port)
         LOCAL_TTYD_PORT="$2"
+        shift # past argument
+        ;;
+      -o|--docker-options)
+        EXTRA_DOCKER_OPTIONS="$2"
         shift # past argument
         ;;
       -r|--nprow)
@@ -106,4 +112,5 @@ docker run $DOCKER_ARGS $PORT \
     -e APPL=$APPL \
     -e NPCOL=$NPCOL \
     -e NPROW=$NPROW \
+    $EXTRA_DOCKER_OPTIONS \
     $IMAGE $CMD
