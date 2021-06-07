@@ -12,6 +12,8 @@ set bar = '-=-=--=-=-=-=--=-=-=-=--=-=-=-=--=-=-=-=--=-=-=-=--=-=-=-=--=-=-'
 #>      Runtime Environment Options
 # ===================================================================
 
+setenv limit unlimited
+
 setenv CMAQ_HOME        /usr/local/src/CMAQ_REPO
 setenv CMAQ_DATA        $CMAQ_HOME/data
 
@@ -847,4 +849,3 @@ echo "     Total Time = ${RTMTOT}"
 echo "      Avg. Time = ${RTMAVG}"
 
 exit( 0 )
-

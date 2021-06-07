@@ -12,6 +12,8 @@ set bar = '-=-=--=-=-=-=--=-=-=-=--=-=-=-=--=-=-=-=--=-=-=-=--=-=-=-=--=-=-'
 #>      Runtime Environment Options
 # ===================================================================
 
+setenv limit unlimited
+
 setenv CMAQ_HOME        /usr/local/src/CMAQ_REPO
 setenv CMAQ_DATA        $CMAQ_HOME/data
 
@@ -43,7 +45,7 @@ if ( ! $?RUN_LENGTH )  setenv RUN_LENGTH    240000
 if ( ! $?TIME_STEP  )  setenv TIME_STEP     10000
 if ( ! $?NMLDIR     )  setenv NMLDIR        ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_gcc
 
-if ( ! $?APPL       )  setenv APPL           12US2 
+if ( ! $?APPL       )  setenv APPL           12US2
 if ( ! $?EMIS       )  setenv EMIS           2016fh
 if ( ! $?PROC       )  setenv PROC           mpi
 if ( ! $?NPCOL      )  setenv NPCOL          6
