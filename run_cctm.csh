@@ -17,6 +17,8 @@ setenv limit unlimited
 setenv CMAQ_HOME        /usr/local/src/CMAQ_REPO
 setenv CMAQ_DATA        $CMAQ_HOME/data
 
+cd $CMAQ_HOME/CCTM/scripts
+
 echo 'Start Model Run At ' `date`
 
 #>      Set General Parameters for Configuring the Simulation

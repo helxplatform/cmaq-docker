@@ -99,23 +99,23 @@ make install
 #  ----------------------------------------
 #  Use tcsh 6.20 instead of the broken 6.21
 #  ----------------------------------------
-cd /usr/local/src
-wget http://ftp.funet.fi/pub/mirrors/ftp.astron.com/pub/tcsh/old/tcsh-6.20.00.tar.gz
-tar xvf tcsh-6.20.00.tar.gz
-rm -f tcsh-6.20.00.tar.gz
-cd tcsh-6.20.00
-./configure --disable-nls
-make > make.gcc9.log 2>&1
-make install
-ln -s /usr/local/bin/tcsh /bin/csh
+# cd /usr/local/src
+# wget http://ftp.funet.fi/pub/mirrors/ftp.astron.com/pub/tcsh/old/tcsh-6.20.00.tar.gz
+# tar xvf tcsh-6.20.00.tar.gz
+# rm -f tcsh-6.20.00.tar.gz
+# cd tcsh-6.20.00
+# ./configure --disable-nls
+# make > make.gcc9.log 2>&1
+# make install
+# ln -s /usr/local/bin/tcsh /bin/csh
 #  ----------------------
 #  Download and build vim
 #  ----------------------
-cd /usr/local/src
-git clone https://github.com/vim/vim.git vim
-cd vim
-./configure
-make > make.gcc9.log 2>&1
-make install
-cd /usr/local/bin
-ln -s vim vi
+# cd /usr/local/src
+# git clone https://github.com/vim/vim.git vim
+# cd vim
+# ./configure
+# make > make.gcc9.log 2>&1
+# make install
+# cd /usr/local/bin
+# ln -s vim vi
