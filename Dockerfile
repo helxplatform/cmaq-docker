@@ -24,10 +24,15 @@ RUN $BUILD_HOME/build-ioapi.sh
 
 COPY build-cmaq.sh .
 RUN $BUILD_HOME/build-cmaq.sh && \
-    chown "${NB_UID}" "${CMAQ_HOME}" && \
     fix-permissions "/home/${NB_USER}" && \
-    fix-permissions $CMAQ_HOME/CCTM/scripts && \
-    fix-permissions $CMAQ_HOME/data
+    rmdir $CMAQ_HOME/data && \
+    ln -s /home/shared/cmaq/data $CMAQ_HOME/data && \
+    ln -s /home/shared/cmaq/run_cctm.csh $CMAQ_HOME/CCTM/scripts/run_cctm.csh && \
+    fix-permissions $CMAQ_HOME
+
+# Should only need to set permissions for the scripts directory and not for all
+# of $CMAQ_HOME.  Leaving it for now while we test.
+#     fix-permissions $CMAQ_HOME/CCTM/scripts
 
 USER $NB_UID
 # WORKDIR $CMAQ_HOME/CCTM/scripts
