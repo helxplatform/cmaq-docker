@@ -7,7 +7,8 @@ BENCHMARK_DATA="$HOME/CMAQv5.3.2_Benchmark_2Day_Input"
 APPL=2016_12SE1
 NPCOL=4
 NPROW=4
-CMD="bash -c ./run_cctm.csh"
+CMAQ_SCRIPTS_DIR="/usr/local/src/CMAQ_REPO/CCTM/scripts"
+CMD="bash -c \"cd $CMAQ_SCRIPTS_DIR && ./run_cctm.csh\""
 PORT=""
 CREDS=""
 DOCKER_ARGS=""
@@ -85,7 +86,7 @@ SCRIPT_LOG="$SCRIPT_DIR/log-$TIMESTAMP.txt"
 
 docker run $DOCKER_ARGS $PORT \
     -v "$BENCHMARK_DATA:/usr/local/src/CMAQ_REPO/data" \
-    -v "$SCRIPT_DIR/$ENTRYPOINT_SCRIPT:/usr/local/src/CMAQ_REPO/CCTM/scripts/run_cctm.csh" \
+    -v "$SCRIPT_DIR/$ENTRYPOINT_SCRIPT:$CMAQ_SCRIPTS_DIR/run_cctm.csh" \
     -e APPL=$APPL \
     -e NPCOL=$NPCOL \
     -e NPROW=$NPROW \
