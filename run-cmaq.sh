@@ -24,7 +24,7 @@ usage: $0
   -d|--data            specify data directory (default=$BENCHMARK_DATA)
   -e|--entrypoint      specify a script to mount in the container and run (default=run_cctm.csh)
   -h|--help            Print this help message.
-  -i|--local-image     use localhost registry for image
+  -i|--image           specify registry/repo:tag image (default = $IMAGE, ex. cmaq:latest)
   -l|--local-ttyd-port specify TTYD port to use on localhost
   -o|--docker-options  specify any extra docker command options
   -r|--nprow           specify nprow value (default=$NPROW)
@@ -57,8 +57,9 @@ while [[ $# > 0 ]]
         print_help
         exit 0
         ;;
-      -i|--local-image)
-        IMAGE=cmaq:latest
+      -i|--image)
+        IMAGE="$2"
+        shift
         ;;
       -l|--local-ttyd-port)
         LOCAL_TTYD_PORT="$2"
